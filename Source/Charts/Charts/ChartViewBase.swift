@@ -607,7 +607,9 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
             // check bounds
             if !_viewPortHandler.isInBounds(x: pos.x, y: pos.y)
             {
-                continue
+                /// < Dirty workaround for half pie issues >
+                // continue
+                /// </ Dirty workaround for half pie issues >
             }
 
             // callbacks to update the content
