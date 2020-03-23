@@ -607,6 +607,11 @@ open class PieChartRenderer: DataRenderer
             let radius = chart.radius
             let holeRadius = radius * chart.holeRadiusPercent
             let center = chart.centerCircleBox
+            
+            /// < Dirty workaround for half pie issues >
+            let spacing = (chart.data?._dataSets.first as? PieChartDataSet)?.sliceSpace ?? 0
+            context.clip(to: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius - spacing / 2))
+            /// </ Dirty workaround for half pie issues >
 
             if let holeColor = chart.holeColor
             {
