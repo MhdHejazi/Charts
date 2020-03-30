@@ -47,7 +47,7 @@ open class RadarChartRenderer: LineRadarRenderer
             self.accessibleChartElements.removeAll()
 
             // Make the chart header the first element in the accessible elements array
-            if let accessibilityHeaderData = radarData as? RadarChartData {
+            if accessibilitySupported, let accessibilityHeaderData = radarData as? RadarChartData {
                 let element = createAccessibleHeader(usingChart: chart,
                                                      andData: accessibilityHeaderData,
                                                      withDefaultDescription: "Radar Chart")
@@ -121,25 +121,27 @@ open class RadarChartRenderer: LineRadarRenderer
                 path.addLine(to: p)
             }
 
-            let accessibilityLabel = accessibilityAxisLabelValueTuples[j].0
-            let accessibilityValue = accessibilityAxisLabelValueTuples[j].1
-            let accessibilityValueIndex = accessibilityAxisLabelValueTuples[j].2
+			if accessibilitySupported {
+                let accessibilityLabel = accessibilityAxisLabelValueTuples[j].0
+                let accessibilityValue = accessibilityAxisLabelValueTuples[j].1
+                let accessibilityValueIndex = accessibilityAxisLabelValueTuples[j].2
 
-            let axp = center.moving(distance: CGFloat((accessibilityValue - chart.chartYMin) * Double(factor) * phaseY),
-                                    atAngle: sliceangle * CGFloat(accessibilityValueIndex) * CGFloat(phaseX) + chart.rotationAngle)
+                let axp = center.moving(distance: CGFloat((accessibilityValue - chart.chartYMin) * Double(factor) * phaseY),
+                                        atAngle: sliceangle * CGFloat(accessibilityValueIndex) * CGFloat(phaseX) +     chart.rotationAngle)
 
-            let axDescription = description + " - " + accessibilityLabel + ": \(accessibilityValue) \(chart.data?.accessibilityEntryLabelSuffix ?? "")"
-            let axElement = createAccessibleElement(withDescription: axDescription,
-                                                    container: chart,
-                                                    dataSet: dataSet)
-            { (element) in
-                element.accessibilityFrame = CGRect(x: axp.x - accessibilityFrameWidth,
-                                                    y: axp.y - accessibilityFrameWidth,
-                                                    width: 2 * accessibilityFrameWidth,
-                                                    height: 2 * accessibilityFrameWidth)
-            }
+                let axDescription = description + " - " + accessibilityLabel + ": \(accessibilityValue)     \(chart.data?.accessibilityEntryLabelSuffix ?? "")"
+                let axElement = createAccessibleElement(withDescription: axDescription,
+                                                        container: chart,
+                                                        dataSet: dataSet)
+                { (element) in
+                    element.accessibilityFrame = CGRect(x: axp.x - accessibilityFrameWidth,
+                                                        y: axp.y - accessibilityFrameWidth,
+                                                        width: 2 * accessibilityFrameWidth,
+                                                        height: 2 * accessibilityFrameWidth)
+                }
 
-            accessibilityEntryElements.append(axElement)
+                accessibilityEntryElements.append(axElement)
+			}
         }
         
         // if this is the largest set, close it
@@ -175,16 +177,18 @@ open class RadarChartRenderer: LineRadarRenderer
             context.addPath(path)
             context.strokePath()
 
-            let axElement = createAccessibleElement(withDescription: accessibilityDataSetDescription,
-                                                    container: chart,
-                                                    dataSet: dataSet)
-            { (element) in
-                element.isHeader = true
-                element.accessibilityFrame = path.boundingBoxOfPath
-            }
+			if accessibilitySupported {
+                let axElement = createAccessibleElement(withDescription: accessibilityDataSetDescription,
+                                                        container: chart,
+                                                        dataSet: dataSet)
+                { (element) in
+                    element.isHeader = true
+                    element.accessibilityFrame = path.boundingBoxOfPath
+                }
 
-            accessibleChartElements.append(axElement)
-            accessibleChartElements.append(contentsOf: accessibilityEntryElements)
+                accessibleChartElements.append(axElement)
+                accessibleChartElements.append(contentsOf: accessibilityEntryElements)
+			}
         }
         
         accessibilityPostLayoutChangedNotification()

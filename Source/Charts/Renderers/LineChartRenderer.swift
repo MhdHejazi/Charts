@@ -545,18 +545,20 @@ open class LineChartRenderer: LineRadarRenderer
         
         var pt = CGPoint()
         var rect = CGRect()
-        
-        // If we redraw the data, remove and repopulate accessible elements to update label values and frames
-        accessibleChartElements.removeAll()
-        accessibilityOrderedElements = accessibilityCreateEmptyOrderedElements()
 
-        // Make the chart header the first element in the accessible elements array
-        if let chart = dataProvider as? LineChartView {
-            let element = createAccessibleHeader(usingChart: chart,
-                                                 andData: lineData,
-                                                 withDefaultDescription: "Line Chart")
-            accessibleChartElements.append(element)
-        }
+		if accessibilitySupported {
+            // If we redraw the data, remove and repopulate accessible elements to update label values and frames
+            accessibleChartElements.removeAll()
+            accessibilityOrderedElements = accessibilityCreateEmptyOrderedElements()
+
+            // Make the chart header the first element in the accessible elements array
+            if let chart = dataProvider as? LineChartView {
+                let element = createAccessibleHeader(usingChart: chart,
+                                                     andData: lineData,
+                                                     withDefaultDescription: "Line Chart")
+                accessibleChartElements.append(element)
+            }
+		}
 
         context.saveGState()
 
@@ -612,7 +614,7 @@ open class LineChartRenderer: LineRadarRenderer
                                                width: scaleFactor * circleDiameter,
                                                height: scaleFactor * circleDiameter)
                 // Create and append the corresponding accessibility element to accessibilityOrderedElements
-                if let chart = dataProvider as? LineChartView
+                if accessibilitySupported, let chart = dataProvider as? LineChartView
                 {
                     let element = createAccessibleElement(withIndex: j,
                                                           container: chart,
@@ -675,9 +677,11 @@ open class LineChartRenderer: LineRadarRenderer
         
         context.restoreGState()
 
-        // Merge nested ordered arrays into the single accessibleChartElements.
-        accessibleChartElements.append(contentsOf: accessibilityOrderedElements.flatMap { $0 } )
-        accessibilityPostLayoutChangedNotification()
+		if accessibilitySupported {
+            // Merge nested ordered arrays into the single accessibleChartElements.
+            accessibleChartElements.append(contentsOf: accessibilityOrderedElements.flatMap { $0 } )
+            accessibilityPostLayoutChangedNotification()
+		}
     }
     
     open override func drawHighlighted(context: CGContext, indices: [Highlight])

@@ -287,18 +287,20 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             let dataProvider = dataProvider,
             let barData = dataProvider.barData
             else { return }
-        
-        // If we redraw the data, remove and repopulate accessible elements to update label values and frames
-        accessibleChartElements.removeAll()
-        accessibilityOrderedElements = accessibilityCreateEmptyOrderedElements()
 
-        // Make the chart header the first element in the accessible elements array
-        if let chart = dataProvider as? BarChartView {
-            let element = createAccessibleHeader(usingChart: chart,
-                                                 andData: barData,
-                                                 withDefaultDescription: "Bar Chart")
-            accessibleChartElements.append(element)
-        }
+		if accessibilitySupported {
+            // If we redraw the data, remove and repopulate accessible elements to update label values and frames
+            accessibleChartElements.removeAll()
+            accessibilityOrderedElements = accessibilityCreateEmptyOrderedElements()
+
+            // Make the chart header the first element in the accessible elements array
+            if let chart = dataProvider as? BarChartView {
+                let element = createAccessibleHeader(usingChart: chart,
+                                                     andData: barData,
+                                                     withDefaultDescription: "Bar Chart")
+                accessibleChartElements.append(element)
+            }
+		}
 
         // Populate logically ordered nested elements into accessibilityOrderedElements in drawDataSet()
         for i in 0 ..< barData.dataSetCount
@@ -316,9 +318,11 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             }
         }
 
-        // Merge nested ordered arrays into the single accessibleChartElements.
-        accessibleChartElements.append(contentsOf: accessibilityOrderedElements.flatMap { $0 } )
-        accessibilityPostLayoutChangedNotification()
+		if accessibilitySupported {
+            // Merge nested ordered arrays into the single accessibleChartElements.
+            accessibleChartElements.append(contentsOf: accessibilityOrderedElements.flatMap { $0 } )
+            accessibilityPostLayoutChangedNotification()
+		}
     }
 
     private var _barShadowRectBuffer: CGRect = CGRect()
@@ -441,7 +445,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             }
 
             // Create and append the corresponding accessibility element to accessibilityOrderedElements
-            if let chart = dataProvider as? BarChartView
+            if accessibilitySupported, let chart = dataProvider as? BarChartView
             {
                 let element = createAccessibleElement(withIndex: j,
                                                       container: chart,

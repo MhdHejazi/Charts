@@ -278,7 +278,7 @@ open class HorizontalBarChartRenderer: BarChartRenderer
             }
 
             // Create and append the corresponding accessibility element to accessibilityOrderedElements (see BarChartRenderer)
-            if let chart = dataProvider as? BarChartView
+            if accessibilitySupported, let chart = dataProvider as? BarChartView
             {
                 let element = createAccessibleElement(withIndex: j,
                                                       container: chart,

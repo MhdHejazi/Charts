@@ -27,16 +27,18 @@ open class CandleStickChartRenderer: LineScatterCandleRadarRenderer
     {
         guard let dataProvider = dataProvider, let candleData = dataProvider.candleData else { return }
 
-        // If we redraw the data, remove and repopulate accessible elements to update label values and frames
-        accessibleChartElements.removeAll()
+		if accessibilitySupported {
+            // If we redraw the data, remove and repopulate accessible elements to update label values and frames
+            accessibleChartElements.removeAll()
 
-        // Make the chart header the first element in the accessible elements array
-        if let chart = dataProvider as? CandleStickChartView {
-            let element = createAccessibleHeader(usingChart: chart,
-                                                 andData: candleData,
-                                                 withDefaultDescription: "CandleStick Chart")
-            accessibleChartElements.append(element)
-        }
+            // Make the chart header the first element in the accessible elements array
+            if let chart = dataProvider as? CandleStickChartView {
+                let element = createAccessibleHeader(usingChart: chart,
+                                                     andData: candleData,
+                                                     withDefaultDescription: "CandleStick Chart")
+                accessibleChartElements.append(element)
+            }
+		}
 
         for set in candleData.dataSets as! [ICandleChartDataSet] where set.isVisible
         {
@@ -247,15 +249,17 @@ open class CandleStickChartRenderer: LineScatterCandleRadarRenderer
                 context.strokeLineSegments(between: _closePoints)
             }
 
-            let axElement = createAccessibleElement(withIndex: j,
-                                                    container: dataProvider,
-                                                    dataSet: dataSet)
-            { (element) in
-                element.accessibilityLabel = "\(doesContainMultipleDataSets ? "\(dataSet.label ?? "Dataset")" : "") " + "\(xPos) - \(accessibilityMovementDescription). low: \(low), high: \(high), opening: \(open), closing: \(close)"
-                element.accessibilityFrame = accessibilityRect
-            }
+			if accessibilitySupported {
+                let axElement = createAccessibleElement(withIndex: j,
+                                                        container: dataProvider,
+                                                        dataSet: dataSet)
+                { (element) in
+                    element.accessibilityLabel = "\(doesContainMultipleDataSets ? "\(dataSet.label ?? "Dataset")" : "") " + "\(xPos) - \(accessibilityMovementDescription). low: \(low), high: \(high), opening: \(open), closing: \(close)"
+                    element.accessibilityFrame = accessibilityRect
+                }
 
-            accessibleChartElements.append(axElement)
+                accessibleChartElements.append(axElement)
+			}
 
         }
 

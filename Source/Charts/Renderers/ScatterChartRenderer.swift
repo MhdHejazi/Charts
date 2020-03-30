@@ -30,7 +30,7 @@ open class ScatterChartRenderer: LineScatterCandleRadarRenderer
         // If we redraw the data, remove and repopulate accessible elements to update label values and frames
         accessibleChartElements.removeAll()
         
-        if let chart = dataProvider as? ScatterChartView {
+        if accessibilitySupported, let chart = dataProvider as? ScatterChartView {
             // Make the chart header the first element in the accessible elements array
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: scatterData,

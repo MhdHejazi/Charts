@@ -23,6 +23,8 @@ import Cocoa
 @objc(ChartDataRendererBase)
 open class DataRenderer: Renderer
 {
+	let accessibilitySupported = false
+
     /// An array of accessibility elements that are presented to the ChartViewBase accessibility methods.
     ///
     /// Note that the order of elements in this array determines the order in which they are presented and navigated by
